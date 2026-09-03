@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Schedule</title>
+<style>
+:root{
+  --paper:#f7f6f2;
+  --surface:#ffffff;
+  --surface-alt:#f2f0ea;
+  --raised:#ece9e1;
+  --line:#e1ddd2;
+  --ink:#26251f;
+  --muted:#726d62;
+  --faint:#a49e8f;
+  --emerald:#1f6f54;
+  --emerald-dim:#e6efeb;
+  --gold:#a97d2e;
+  --gold-dim:#f3ead8;
+  --plum:#7c5a80;
+  --plum-dim:#efe6f0;
+  --danger:#b3453d;
+  --radius:10px;
+  --font-display:'Fraunces','Georgia',serif;
+  --font-body:'Inter',sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:36px 24px 70px;
+}
+
+header.top{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:26px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--line);
+}
+header.top h1{
+  font-family:var(--font-display);
+  font-size:26px;
+  font-weight:600;
+  margin:0;
+  letter-spacing:0.1px;
+  color:var(--ink);
+}
+header.top a.nav-link{
+  font-size:13.5px;
+  color:var(--emerald);
+  text-decoration:none;
+  font-family:var(--font-body);
+  font-weight:500;
+  white-space:nowrap;
+}
+header.top a.nav-link:hover{ text-decoration:underline; }
+header.top .updated{
+  font-size:12.5px;
+  color:var(--faint);
+  font-family:var(--font-body);
+}
+header.top .nav-right{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+/* ---- hero (today) ---- */
+.hero-date{
+  font-family:var(--font-display);
+  font-size:19px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+.hero-date b{ color:var(--ink); font-weight:600; }
+
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:12px;
+  margin:0 0 32px;
+}
+.stat-chip{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-top:3px solid var(--faint);
+  border-radius:8px;
+  padding:15px 16px;
+  font-family:var(--font-body);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.stat-chip .n{ font-family:var(--font-display); font-size:27px; font-weight:600; line-height:1; color:var(--ink); }
+.stat-chip .l{ font-size:12px; color:var(--muted); }
+.stat-chip.eu{ border-top-color:var(--emerald); }
+.stat-chip.glo{ border-top-color:var(--gold); }
+.stat-chip.udp{ border-top-color:var(--plum); }
+
+/* ---- shift group cards ---- */
+.shift-group{
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  margin-bottom:18px;
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(38,37,31,0.04);
+}
+.shift-group.off-group{ opacity:0.75; }
+.shift-group-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 22px;
+  background:var(--surface-alt);
+  border-bottom:1px solid var(--line);
+}
+.shift-group-header .name{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:16.5px;
+  color:var(--ink);
+}
+.shift-group-header .count{
+  font-size:11.5px;
+  color:var(--muted);
+  font-family:var(--font-body);
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:3px 12px;
+}
+.agent-list{ display:flex; flex-direction:column; }
+.agent-row{
+  display:grid;
+  grid-template-columns:36px 1fr auto;
+  align-items:center;
+  gap:14px;
+  padding:12px 22px;
+  border-bottom:1px solid var(--line);
+  font-family:var(--font-body);
+  font-size:14px;
+  transition:background-color .12s ease;
+}
+.agent-row:last-child{ border-bottom:none; }
+.agent-row:nth-child(even){ background:var(--surface-alt); }
+.agent-row:hover{ background:var(--raised); }
+
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:13px;
+  flex-shrink:0;
+}
+.avatar.eu{ background:var(--emerald-dim); color:var(--emerald); }
+.avatar.glo{ background:var(--gold-dim); color:var(--gold); }
+.avatar.udp{ background:var(--plum-dim); color:var(--plum); }
+.avatar.other{ background:var(--raised); color:var(--muted); }
+
+.agent-info{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+.agent-info .name{
+  color:var(--ink);
+  font-weight:500;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.agent-info .sysid{ color:var(--faint); font-size:11.5px; }
+
+.pill{
+  display:inline-block;
+  padding:3px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  font-family:var(--font-body);
+  flex-shrink:0;
+}
+.pill.eu{ background:var(--emerald-dim); color:var(--emerald); }
+.pill.glo{ background:var(--gold-dim); color:var(--gold); }
+.pill.udp{ background:var(--plum-dim); color:var(--plum); }
+.pill.other{ background:var(--raised); color:var(--muted); }
+
+/* ---- filters (details page) ---- */
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:20px;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:150px;
+}
+.field.grow{ flex:1 1 220px; }
+.field label{
+  font-size:12px;
+  color:var(--muted);
+}
+select, input[type="text"]{
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--ink);
+  border-radius:8px;
+  padding:9px 12px;
+  font-size:14px;
+  font-family:var(--font-body);
+  outline:none;
+  transition:border-color .15s ease;
+}
+select:focus, input[type="text"]:focus{ border-color:var(--emerald); }
+select{ cursor:pointer; }
+input[type="text"]::placeholder{ color:var(--faint); }
+
+.clear-btn{
+  align-self:flex-end;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+  border-radius:8px;
+  padding:9px 15px;
+  font-size:13px;
+  font-family:var(--font-body);
+  cursor:pointer;
+  transition:border-color .15s ease, color .15s ease;
+}
+.clear-btn:hover{ border-color:var(--emerald); color:var(--emerald); }
+
+.summary{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:14px;
+  font-family:var(--font-body);
+}
+.summary b{ color:var(--ink); font-weight:600; }
+
+.table-shell{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:auto;
+  background:var(--surface);
+  box-shadow:0 1px 2px rgba(38,37,31,0.04);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--font-body);
+  font-size:14px;
+  min-width:640px;
+}
+thead th{
+  position:sticky; top:0;
+  background:var(--surface-alt);
+  text-align:left;
+  padding:12px 18px;
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:12.5px;
+  color:var(--muted);
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+tbody td{
+  padding:11px 18px;
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+  color:var(--ink);
+}
+tbody tr:nth-child(even){ background:var(--surface-alt); }
+tbody tr:hover{ background:var(--raised); }
+tbody tr:last-child td{ border-bottom:none; }
+.off-row td{ color:var(--faint); }
+.off-tag{ color:var(--faint); font-style:normal; font-size:13px; }
+
+.state-msg{
+  padding:44px 20px;
+  text-align:center;
+  color:var(--muted);
+  font-family:var(--font-body);
+  font-size:14px;
+}
+.state-msg.error{ color:var(--danger); }
+
+footer.note{
+  margin-top:20px;
+  font-size:12px;
+  color:var(--faint);
+  font-family:var(--font-body);
+  line-height:1.6;
+}
+
+@media (max-width:640px){
+  .wrap{ padding:24px 16px 48px; }
+  header.top h1{ font-size:21px; }
+  .field{ min-width:130px; }
+  .stat-row{ grid-template-columns:repeat(2, 1fr); }
+  .agent-row{ grid-template-columns:32px 1fr auto; }
+}
+
+/* Standalone single-file navigation */
+.view-hidden { display:none !important; }
+.single-nav { display:flex; gap:18px; align-items:center; margin-bottom:22px; }
+.single-nav button { background:transparent; border:0; color:var(--emerald); font:500 13.5px var(--font-body); cursor:pointer; padding:0; }
+.single-nav button.active { font-weight:700; text-decoration:underline; }
+</style>
+</head>
+<body>
+<div id="viewToday">
+<div class="wrap">
+  <header class="top">
+    <h1>Shift Schedule</h1>
+    <div class="nav-right">
+      <div class="updated" id="updatedAt">লোড হচ্ছে…</div>
+      <a class="nav-link" href="schedule-details.html">সব এন্ট্রি / এজেন্ট হিস্ট্রি দেখুন →</a>
+    </div>
+  </header>
+
+  <div class="hero-date" id="heroDate">আজকের তারিখ লোড হচ্ছে…</div>
+  <div class="stat-row" id="statRow"></div>
+
+  <div id="groupsHolder"></div>
+  <div class="state-msg" id="stateMsg">লোড হচ্ছে…</div>
+
+  <footer class="note">
+    এই পেজে কোনো লগইন নেই — সবাই দেখতে পারে। শুধু আজকের শিডিউল এখানে দেখানো হচ্ছে। অন্য কোনো তারিখ বা কোনো এজেন্টের পুরো হিস্ট্রি দেখতে উপরের "সব এন্ট্রি" লিঙ্কে যান।
+  </footer>
+</div>
+</div>
+<div id="viewDetails" class="view-hidden">
+<div class="wrap">
+  <header class="top">
+    <h1>সব শিফট এন্ট্রি</h1>
+    <div class="nav-right">
+      <div class="updated" id="updatedAt">লোড হচ্ছে…</div>
+      <a class="nav-link" href="index.html">← আজকের শিডিউলে ফিরে যান</a>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="field">
+      <label for="fMonth">মাস</label>
+      <select id="fMonth"><option value="">সব</option></select>
+    </div>
+    <div class="field">
+      <label for="fRegion">Region</label>
+      <select id="fRegion"><option value="">সব</option></select>
+    </div>
+    <div class="field">
+      <label for="fShift">Shift</label>
+      <select id="fShift"><option value="">সব</option></select>
+    </div>
+    <div class="field grow">
+      <label for="fAgent">Agent নাম / System ID খুঁজুন</label>
+      <input type="text" id="fAgent" placeholder="যেমন: Hafsa Rahman">
+    </div>
+    <button class="clear-btn" id="clearBtn">রিসেট</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="table-shell">
+    <table id="schedTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Shift</th>
+          <th>System ID</th>
+          <th>Agent Name</th>
+          <th>Region</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="state-msg" id="stateMsg">লোড হচ্ছে…</div>
+  </div>
+
+  <footer class="note">
+    কোনো লগইন নেই — সবাই দেখতে পারে। Sheet-এ পরিবর্তন করলে এই পেজ রিফ্রেশ করলেই নতুন তথ্য দেখাবে।
+  </footer>
+</div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — নিজের Google Sheet বসান এখানে (একবারই, দুই পেজেই কাজ করবে)
+   ------------------------------------------------------------
+   ১) Google Sheet খুলুন → নিচে কলাম রাখুন এই ক্রমে (হেডার সহ):
+        Date | Shift | System ID | Agent Name | Region
+      Date ফরম্যাট: 2026-09-03  অথবা  3-Sep-26  — দুটোই চলবে।
+   ২) Sheet-টা Share করুন → "Anyone with the link" → Viewer.
+   ৩) Sheet URL থেকে SHEET_ID কপি করুন:
+        https://docs.google.com/spreadsheets/d/[[ এই অংশটা ]]/edit
+   ৪) নিচের Tab/Sheet নামটা বসান
+   ============================================================ */
+const CONFIG = {
+  SHEET_ID: "1qIhXOv2jU2pQagJbzkYms1vAQ9JPtAhwSNmibGfFZS4",
+  SHEET_NAME: "Schedule",
+  REFRESH_MS: 60000 // প্রতি ৬০ সেকেন্ডে অটো-রিফ্রেশ, চাইলে বদলান
+};
+
+const csvUrl = () =>
+  `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}&_=${Date.now()}`;
+
+// ---- lightweight CSV parser (handles quoted fields with commas) ----
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i], next = text[i+1];
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else{ field += c; }
+    } else {
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field=''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c === '\r'){ /* skip */ }
+      else{ field += c; }
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ''));
+}
+
+function normalizeDate(raw){
+  if(!raw) return {sortKey:'', display:'', month:''};
+  raw = raw.trim();
+  let d;
+  let m = raw.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2,4})$/); // 3-Sep-26
+  if(m){
+    const monthMap = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    let yr = m[3].length===2 ? 2000+parseInt(m[3]) : parseInt(m[3]);
+    d = new Date(yr, monthMap[m[2]], parseInt(m[1]));
+  } else {
+    d = new Date(raw);
+  }
+  if(isNaN(d)) return {sortKey:raw, display:raw, month:''};
+  const dd = String(d.getDate()).padStart(2,'0');
+  const monthsBn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const display = `${dd}-${monthsBn[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
+  const sortKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${dd}`;
+  const month = `${monthsBn[d.getMonth()]} ${d.getFullYear()}`;
+  return {sortKey, display, month};
+}
+
+function todaySortKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function regionPillClass(region){
+  const r = (region||'').trim().toUpperCase();
+  if(r === 'EU') return 'eu';
+  if(r === 'GLO' || r === 'GLOBAL') return 'glo';
+  if(r === 'UDP') return 'udp';
+  return 'other';
+}
+
+async function fetchScheduleRows(){
+  const res = await fetch(csvUrl());
+  if(!res.ok) throw new Error('fetch failed');
+  const text = await res.text();
+  const rows = parseCSV(text);
+  if(rows.length < 2) throw new Error('empty sheet');
+
+  const header = rows[0].map(h => h.trim().toLowerCase());
+  const idx = {
+    date: header.findIndex(h => h.includes('date')),
+    shift: header.findIndex(h => h.includes('shift')),
+    systemId: header.findIndex(h => h.includes('system')),
+    agentName: header.findIndex(h => h.includes('agent')),
+    region: header.findIndex(h => h.includes('region')),
+  };
+
+  return rows.slice(1).map(r => {
+    const dateInfo = normalizeDate(r[idx.date] || '');
+    return {
+      dateDisplay: dateInfo.display,
+      sortKey: dateInfo.sortKey,
+      month: dateInfo.month,
+      shift: (r[idx.shift] || '').trim(),
+      systemId: (r[idx.systemId] || '').trim(),
+      agentName: (r[idx.agentName] || '').trim(),
+      region: (r[idx.region] || '').trim(),
+    };
+  }).filter(r => r.agentName || r.systemId);
+}
+
+
+/* --- Original Today-page logic --- */
+
+  const monthsBn
+
+/* --- Original Details-page logic --- */
+let ALL_ROWS = [];
+
+  function populateSelect(id, values){
+    const el = document.getElementById(id);
+    const current = el.value;
+    el.innerHTML = '<option value="">সব</option>' +
+      values.map(v => `<option value="${v}">${v}</option>`).join('');
+    if(values.includes(current)) el.value = current;
+  }
+
+  function render(){
+    const month = document.getElementById('fMonth').value;
+    const region = document.getElementById('fRegion').value;
+    const shift = document.getElementById('fShift').value;
+    const agentQ = document.getElementById('fAgent').value.trim().toLowerCase();
+
+    let rows = ALL_ROWS.filter(r => {
+      if(month && r.month !== month) return false;
+      if(region && r.region !== region) return false;
+      if(shift && r.shift !== shift) return false;
+      if(agentQ && !(r.agentName.toLowerCase().includes(agentQ) || r.systemId.toLowerCase().includes(agentQ))) return false;
+      return true;
+    });
+
+    rows.sort((a,b) => a.sortKey.localeCompare(b.sortKey) || a.shift.localeCompare(b.shift));
+
+    const tbody = document.getElementById('tbody');
+    const table = document.getElementById('schedTable');
+    const stateMsg = document.getElementById('stateMsg');
+
+    if(rows.length === 0){
+      table.style.display = 'none';
+      stateMsg.style.display = 'block';
+      stateMsg.textContent = 'কোনো তথ্য পাওয়া যায়নি — ফিল্টার বদলে দেখুন।';
+    } else {
+      table.style.display = 'table';
+      stateMsg.style.display = 'none';
+      tbody.innerHTML = rows.map(r => {
+        const isOff = /^off$/i.test(r.shift.trim());
+        return `<tr class="${isOff ? 'off-row' : ''}">
+          <td>${r.dateDisplay}</td>
+          <td>${isOff ? '<span class="off-tag">OFF</span>' : r.shift}</td>
+          <td>${r.systemId}</td>
+          <td>${r.agentName}</td>
+          <td><span class="pill ${regionPillClass(r.region)}">${r.region}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('summary').innerHTML =
+      `মোট <b>${rows.length}</b>টি এন্ট্রি দেখানো হচ্ছে${agentQ ? ` — "${document.getElementById('fAgent').value.trim()}"-এর জন্য` : ''}`;
+  }
+
+  async function loadData(){
+    const stateMsg = document.getElementById('stateMsg');
+    try{
+      ALL_ROWS = await fetchScheduleRows();
+
+      populateSelect('fMonth', [...new Set(ALL_ROWS.map(r=>r.month))].filter(Boolean));
+      populateSelect('fRegion', [...new Set(ALL_ROWS.map(r=>r.region))].filter(Boolean));
+      populateSelect('fShift', [...new Set(ALL_ROWS.map(r=>r.shift))].filter(Boolean).sort());
+
+      document.getElementById('updatedAt').textContent =
+        'সবশেষ আপডেট: ' + new Date().toLocaleString('bn-BD', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
+
+      render();
+    } catch(err){
+      stateMsg.classList.add('error');
+      stateMsg.style.display = 'block';
+      document.getElementById('schedTable').style.display = 'none';
+      if(CONFIG.SHEET_ID === 'PASTE_YOUR_GOOGLE_SHEET_ID_HERE'){
+        stateMsg.textContent = 'এখনো Google Sheet কনফিগার করা হয়নি — shared.js ফাইলে CONFIG-এ SHEET_ID বসান।';
+      } else {
+        stateMsg.textContent = 'ডেটা লোড করা যায়নি। Sheet শেয়ারিং "Anyone with the link – Viewer" আছে কিনা, SHEET_ID/SHEET_NAME ঠিক আছে কিনা চেক করুন। (লোকাল ফাইলে সরাসরি খুললে ব্রাউজার এই রিকোয়েস্ট ব্লক করতে পারে — http server বা GitHub Pages দিয়ে টেস্ট করুন।)';
+      }
+      document.getElementById('updatedAt').textContent = '';
+      console.error(err);
+    }
+  }
+
+  ['fMonth','fRegion','fShift'].forEach(id => document.getElementById(id).addEventListener('change', render));
+  document.getElementById('fAgent').addEventListener('input', render);
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('fMonth').value = '';
+    document.getElementById('fRegion').value = '';
+    document.getElementById('fShift').value = '';
+    document.getElementById('fAgent').value = '';
+    render();
+  });
+
+  loadData();
+  setInterval(loadData, CONFIG.REFRESH_MS);
+</script>
+</body>
+</html>
+
+/* --- Single-file navigation --- */
+(function() {
+  const today = document.getElementById('viewToday');
+  const details = document.getElementById('viewDetails');
+
+  function addNav(container, active) {
+    const wrap = container.querySelector('.wrap');
+    if (!wrap || wrap.querySelector('.single-nav')) return;
+    const nav = document.createElement('div');
+    nav.className = 'single-nav';
+    nav.innerHTML = `
+      <button data-view="today" class="${active === 'today' ? 'active' : ''}">আজকের শিডিউল</button>
+      <button data-view="details" class="${active === 'details' ? 'active' : ''}">সব এন্ট্রি / হিস্ট্রি</button>`;
+    wrap.insertBefore(nav, wrap.firstChild);
+    nav.querySelector('[data-view="today"]').onclick = () => show('today');
+    nav.querySelector('[data-view="details"]').onclick = () => show('details');
+  }
+
+  function show(view) {
+    today.classList.toggle('view-hidden', view !== 'today');
+    details.classList.toggle('view-hidden', view !== 'details');
+    addNav(today, view);
+    addNav(details, view);
+    window.location.hash = view;
+  }
+
+  // Prevent the original cross-page links from navigating away.
+  document.querySelectorAll('a[href="schedule-details.html"], a[href="index.html"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      show(a.getAttribute('href') === 'schedule-details.html' ? 'details' : 'today');
+    });
+  });
+
+  show(location.hash === '#details' ? 'details' : 'today');
+})();
+</script>
+</body>
+</html>
