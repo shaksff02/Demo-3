@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift Schedule · Combined</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== all styles merged ===== */
+    :root{
+      --paper:#f7f6f2;
+      --surface:#ffffff;
+      --surface-alt:#f2f0ea;
+      --raised:#ece9e1;
+      --line:#e1ddd2;
+      --ink:#26251f;
+      --muted:#726d62;
+      --faint:#a49e8f;
+      --emerald:#1f6f54;
+      --emerald-dim:#e6efeb;
+      --gold:#a97d2e;
+      --gold-dim:#f3ead8;
+      --plum:#7c5a80;
+      --plum-dim:#efe6f0;
+      --danger:#b3453d;
+      --radius:10px;
+      --font-display:'Fraunces','Georgia',serif;
+      --font-body:'Inter',sans-serif;
+    }
+
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      background:var(--paper);
+      color:var(--ink);
+      font-family:var(--font-body);
+      -webkit-font-smoothing:antialiased;
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:36px 24px 70px;
+    }
+
+    header.top{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:26px;
+      padding-bottom:20px;
+      border-bottom:1px solid var(--line);
+    }
+    header.top h1{
+      font-family:var(--font-display);
+      font-size:26px;
+      font-weight:600;
+      margin:0;
+      letter-spacing:0.1px;
+      color:var(--ink);
+    }
+    header.top a.nav-link{
+      font-size:13.5px;
+      color:var(--emerald);
+      text-decoration:none;
+      font-family:var(--font-body);
+      font-weight:500;
+      white-space:nowrap;
+    }
+    header.top a.nav-link:hover{ text-decoration:underline; }
+    header.top .updated{
+      font-size:12.5px;
+      color:var(--faint);
+      font-family:var(--font-body);
+    }
+    header.top .nav-right{
+      display:flex;
+      align-items:center;
+      gap:18px;
+    }
+
+    /* ---- hero (today) ---- */
+    .hero-date{
+      font-family:var(--font-display);
+      font-size:19px;
+      color:var(--muted);
+      margin-bottom:20px;
+    }
+    .hero-date b{ color:var(--ink); font-weight:600; }
+
+    .stat-row{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:12px;
+      margin:0 0 32px;
+    }
+    .stat-chip{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-top:3px solid var(--faint);
+      border-radius:8px;
+      padding:15px 16px;
+      font-family:var(--font-body);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .stat-chip .n{ font-family:var(--font-display); font-size:27px; font-weight:600; line-height:1; color:var(--ink); }
+    .stat-chip .l{ font-size:12px; color:var(--muted); }
+    .stat-chip.eu{ border-top-color:var(--emerald); }
+    .stat-chip.glo{ border-top-color:var(--gold); }
+    .stat-chip.udp{ border-top-color:var(--plum); }
+
+    /* ---- shift group cards ---- */
+    .shift-group{
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface);
+      margin-bottom:18px;
+      overflow:hidden;
+      box-shadow:0 1px 2px rgba(38,37,31,0.04);
+    }
+    .shift-group.off-group{ opacity:0.75; }
+    .shift-group-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 22px;
+      background:var(--surface-alt);
+      border-bottom:1px solid var(--line);
+    }
+    .shift-group-header .name{
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:16.5px;
+      color:var(--ink);
+    }
+    .shift-group-header .count{
+      font-size:11.5px;
+      color:var(--muted);
+      font-family:var(--font-body);
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:3px 12px;
+    }
+    .agent-list{ display:flex; flex-direction:column; }
+    .agent-row{
+      display:grid;
+      grid-template-columns:36px 1fr auto;
+      align-items:center;
+      gap:14px;
+      padding:12px 22px;
+      border-bottom:1px solid var(--line);
+      font-family:var(--font-body);
+      font-size:14px;
+      transition:background-color .12s ease;
+    }
+    .agent-row:last-child{ border-bottom:none; }
+    .agent-row:nth-child(even){ background:var(--surface-alt); }
+    .agent-row:hover{ background:var(--raised); }
+
+    .avatar{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:13px;
+      flex-shrink:0;
+    }
+    .avatar.eu{ background:var(--emerald-dim); color:var(--emerald); }
+    .avatar.glo{ background:var(--gold-dim); color:var(--gold); }
+    .avatar.udp{ background:var(--plum-dim); color:var(--plum); }
+    .avatar.other{ background:var(--raised); color:var(--muted); }
+
+    .agent-info{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .agent-info .name{
+      color:var(--ink);
+      font-weight:500;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .agent-info .sysid{ color:var(--faint); font-size:11.5px; }
+
+    .pill{
+      display:inline-block;
+      padding:3px 11px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      font-family:var(--font-body);
+      flex-shrink:0;
+    }
+    .pill.eu{ background:var(--emerald-dim); color:var(--emerald); }
+    .pill.glo{ background:var(--gold-dim); color:var(--gold); }
+    .pill.udp{ background:var(--plum-dim); color:var(--plum); }
+    .pill.other{ background:var(--raised); color:var(--muted); }
+
+    /* ---- filters (details page) ---- */
+    .filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:20px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      min-width:150px;
+    }
+    .field.grow{ flex:1 1 220px; }
+    .field label{
+      font-size:12px;
+      color:var(--muted);
+    }
+    select, input[type="text"]{
+      background:var(--surface);
+      border:1px solid var(--line);
+      color:var(--ink);
+      border-radius:8px;
+      padding:9px 12px;
+      font-size:14px;
+      font-family:var(--font-body);
+      outline:none;
+      transition:border-color .15s ease;
+    }
+    select:focus, input[type="text"]:focus{ border-color:var(--emerald); }
+    select{ cursor:pointer; }
+    input[type="text"]::placeholder{ color:var(--faint); }
+
+    .clear-btn{
+      align-self:flex-end;
+      background:transparent;
+      border:1px solid var(--line);
+      color:var(--muted);
+      border-radius:8px;
+      padding:9px 15px;
+      font-size:13px;
+      font-family:var(--font-body);
+      cursor:pointer;
+      transition:border-color .15s ease, color .15s ease;
+    }
+    .clear-btn:hover{ border-color:var(--emerald); color:var(--emerald); }
+
+    .summary{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:14px;
+      font-family:var(--font-body);
+    }
+    .summary b{ color:var(--ink); font-weight:600; }
+
+    .table-shell{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:auto;
+      background:var(--surface);
+      box-shadow:0 1px 2px rgba(38,37,31,0.04);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-family:var(--font-body);
+      font-size:14px;
+      min-width:640px;
+    }
+    thead th{
+      position:sticky; top:0;
+      background:var(--surface-alt);
+      text-align:left;
+      padding:12px 18px;
+      font-family:var(--font-body);
+      font-weight:600;
+      font-size:12.5px;
+      color:var(--muted);
+      border-bottom:1px solid var(--line);
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:11px 18px;
+      border-bottom:1px solid var(--line);
+      white-space:nowrap;
+      color:var(--ink);
+    }
+    tbody tr:nth-child(even){ background:var(--surface-alt); }
+    tbody tr:hover{ background:var(--raised); }
+    tbody tr:last-child td{ border-bottom:none; }
+    .off-row td{ color:var(--faint); }
+    .off-tag{ color:var(--faint); font-style:normal; font-size:13px; }
+
+    .state-msg{
+      padding:44px 20px;
+      text-align:center;
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:14px;
+    }
+    .state-msg.error{ color:var(--danger); }
+
+    footer.note{
+      margin-top:20px;
+      font-size:12px;
+      color:var(--faint);
+      font-family:var(--font-body);
+      line-height:1.6;
+    }
+
+    @media (max-width:640px){
+      .wrap{ padding:24px 16px 48px; }
+      header.top h1{ font-size:21px; }
+      .field{ min-width:130px; }
+      .stat-row{ grid-template-columns:repeat(2, 1fr); }
+      .agent-row{ grid-template-columns:32px 1fr auto; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ========== TOP HEADER ========== -->
+  <header class="top">
+    <h1>Shift Schedule</h1>
+    <div class="nav-right">
+      <div class="updated" id="updatedAt">লোড হচ্ছে…</div>
+      <a class="nav-link" href="#" id="toggleViewBtn">সব এন্ট্রি দেখুন →</a>
+    </div>
+  </header>
+
+  <!-- ========== TODAY VIEW (default) ========== -->
+  <div id="todayView">
+    <div class="hero-date" id="heroDate">আজকের তারিখ লোড হচ্ছে…</div>
+    <div class="stat-row" id="statRow"></div>
+    <div id="groupsHolder"></div>
+    <div class="state-msg" id="stateMsg">লোড হচ্ছে…</div>
+  </div>
+
+  <!-- ========== DETAILS VIEW (hidden by default) ========== -->
+  <div id="detailsView" style="display:none;">
+    <div class="filters">
+      <div class="field">
+        <label for="fMonth">মাস</label>
+        <select id="fMonth"><option value="">সব</option></select>
+      </div>
+      <div class="field">
+        <label for="fRegion">Region</label>
+        <select id="fRegion"><option value="">সব</option></select>
+      </div>
+      <div class="field">
+        <label for="fShift">Shift</label>
+        <select id="fShift"><option value="">সব</option></select>
+      </div>
+      <div class="field grow">
+        <label for="fAgent">Agent নাম / System ID খুঁজুন</label>
+        <input type="text" id="fAgent" placeholder="যেমন: Hafsa Rahman">
+      </div>
+      <button class="clear-btn" id="clearBtn">রিসেট</button>
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <div class="table-shell">
+      <table id="schedTable" style="display:none">
+        <thead>
+          <tr><th>Date</th><th>Shift</th><th>System ID</th><th>Agent Name</th><th>Region</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="state-msg" id="stateMsgDetails">লোড হচ্ছে…</div>
+    </div>
+  </div>
+
+  <footer class="note">
+    কোনো লগইন নেই — সবাই দেখতে পারে। Sheet-এ পরিবর্তন করলে এই পেজ রিফ্রেশ করলেই নতুন তথ্য দেখাবে।
+  </footer>
+</div>
+
+<script>
+  /* ==============================================================
+     SHARED LOGIC – merged from shared.js + index & details
+     ============================================================== */
+  const CONFIG = {
+    SHEET_ID: "1qIhXOv2jU2pQagJbzkYms1vAQ9JPtAhwSNmibGfFZS4",
+    SHEET_NAME: "Schedule",
+    REFRESH_MS: 60000
+  };
+
+  const csvUrl = () =>
+    `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}&_=${Date.now()}`;
+
+  // ---- CSV parser ----
+  function parseCSV(text){
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for(let i=0;i<text.length;i++){
+      const c = text[i], next = text[i+1];
+      if(inQuotes){
+        if(c === '"' && next === '"'){ field += '"'; i++; }
+        else if(c === '"'){ inQuotes = false; }
+        else{ field += c; }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field=''; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+        else if(c === '\r'){ /* skip */ }
+        else{ field += c; }
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(c => c.trim() !== ''));
+  }
+
+  function normalizeDate(raw){
+    if(!raw) return {sortKey:'', display:'', month:''};
+    raw = raw.trim();
+    let d;
+    let m = raw.match(/^(\d{1,2})-([A-Za-z]{3})-(\d{2,4})$/);
+    if(m){
+      const monthMap = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+      let yr = m[3].length===2 ? 2000+parseInt(m[3]) : parseInt(m[3]);
+      d = new Date(yr, monthMap[m[2]], parseInt(m[1]));
+    } else {
+      d = new Date(raw);
+    }
+    if(isNaN(d)) return {sortKey:raw, display:raw, month:''};
+    const dd = String(d.getDate()).padStart(2,'0');
+    const monthsBn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const display = `${dd}-${monthsBn[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}`;
+    const sortKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${dd}`;
+    const month = `${monthsBn[d.getMonth()]} ${d.getFullYear()}`;
+    return {sortKey, display, month};
+  }
+
+  function todaySortKey(){
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function regionPillClass(region){
+    const r = (region||'').trim().toUpperCase();
+    if(r === 'EU') return 'eu';
+    if(r === 'GLO' || r === 'GLOBAL') return 'glo';
+    if(r === 'UDP') return 'udp';
+    return 'other';
+  }
+
+  async function fetchScheduleRows(){
+    const res = await fetch(csvUrl());
+    if(!res.ok) throw new Error('fetch failed');
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if(rows.length < 2) throw new Error('empty sheet');
+
+    const header = rows[0].map(h => h.trim().toLowerCase());
+    const idx = {
+      date: header.findIndex(h => h.includes('date')),
+      shift: header.findIndex(h => h.includes('shift')),
+      systemId: header.findIndex(h => h.includes('system')),
+      agentName: header.findIndex(h => h.includes('agent')),
+      region: header.findIndex(h => h.includes('region')),
+    };
+
+    return rows.slice(1).map(r => {
+      const dateInfo = normalizeDate(r[idx.date] || '');
+      return {
+        dateDisplay: dateInfo.display,
+        sortKey: dateInfo.sortKey,
+        month: dateInfo.month,
+        shift: (r[idx.shift] || '').trim(),
+        systemId: (r[idx.systemId] || '').trim(),
+        agentName: (r[idx.agentName] || '').trim(),
+        region: (r[idx.region] || '').trim(),
+      };
+    }).filter(r => r.agentName || r.systemId);
+  }
+
+  /* ========== DOM refs ========== */
+  const todayView = document.getElementById('todayView');
+  const detailsView = document.getElementById('detailsView');
+  const toggleBtn = document.getElementById('toggleViewBtn');
+  let showDetails = false;
+
+  /* ========== TODAY RENDER ========== */
+  const monthsBn = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  const weekdaysBn = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+
+  function renderHeroDate(){
+    const d = new Date();
+    document.getElementById('heroDate').innerHTML =
+      `আজ <b>${weekdaysBn[d.getDay()]}, ${d.getDate()} ${monthsBn[d.getMonth()]} ${d.getFullYear()}</b>`;
+  }
+
+  function renderStats(todayRows){
+    const counts = {eu:0, glo:0, udp:0, off:0};
+    todayRows.forEach(r => {
+      if(/^off$/i.test(r.shift.trim())){ counts.off++; return; }
+      const cls = regionPillClass(r.region);
+      if(counts[cls] !== undefined) counts[cls]++;
+    });
+    document.getElementById('statRow').innerHTML = `
+      <div class="stat-chip eu"><span class="n">${counts.eu}</span><span class="l">EU-তে আজ ডিউটিতে</span></div>
+      <div class="stat-chip glo"><span class="n">${counts.glo}</span><span class="l">GLO-তে আজ ডিউটিতে</span></div>
+      <div class="stat-chip udp"><span class="n">${counts.udp}</span><span class="l">UDP-তে আজ ডিউটিতে</span></div>
+      <div class="stat-chip"><span class="n">${counts.off}</span><span class="l">আজ OFF</span></div>
+    `;
+  }
+
+  function renderGroups(todayRows){
+    const holder = document.getElementById('groupsHolder');
+    const stateMsg = document.getElementById('stateMsg');
+
+    if(todayRows.length === 0){
+      holder.innerHTML = '';
+      stateMsg.style.display = 'block';
+      stateMsg.textContent = 'আজকের তারিখের জন্য এখনো কোনো শিডিউল এন্ট্রি পাওয়া যায়নি — Sheet-এ আজকের ব্লকে Shift ভরা হয়েছে কিনা দেখুন।';
+      return;
+    }
+    stateMsg.style.display = 'none';
+
+    const groups = {};
+    todayRows.forEach(r => {
+      const key = r.shift.trim() || '(শিফট ভরা হয়নি)';
+      if(!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    });
+
+    const keys = Object.keys(groups).sort((a,b) => {
+      const aOff = /^off$/i.test(a), bOff = /^off$/i.test(b);
+      if(aOff && !bOff) return 1;
+      if(bOff && !aOff) return -1;
+      return a.localeCompare(b);
+    });
+
+    holder.innerHTML = keys.map(key => {
+      const isOff = /^off$/i.test(key);
+      const rows = groups[key].sort((a,b) => a.agentName.localeCompare(b.agentName));
+      return `
+        <div class="shift-group ${isOff ? 'off-group' : ''}">
+          <div class="shift-group-header">
+            <span class="name">${key}</span>
+            <span class="count">${rows.length} জন</span>
+          </div>
+          <div class="agent-list">
+            ${rows.map(r => {
+              const hasName = r.agentName && r.agentName.trim().toUpperCase() !== 'N/A';
+              const displayName = hasName ? r.agentName : r.systemId;
+              const showId = r.systemId && r.systemId !== displayName && r.systemId.trim().toUpperCase() !== 'N/A';
+              const initials = displayName.trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+              const regionCls = regionPillClass(r.region);
+              return `
+              <div class="agent-row">
+                <span class="avatar ${regionCls}">${initials}</span>
+                <span class="agent-info">
+                  <span class="name">${displayName}</span>
+                  ${showId ? `<span class="sysid">ID: ${r.systemId}</span>` : ''}
+                </span>
+                <span class="pill ${regionCls}">${r.region}</span>
+              </div>
+            `;}).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ========== DETAILS RENDER ========== */
+  let ALL_ROWS = [];
+
+  function populateSelect(id, values){
+    const el = document.getElementById(id);
+    const current = el.value;
+    el.innerHTML = '<option value="">সব</option>' +
+      values.map(v => `<option value="${v}">${v}</option>`).join('');
+    if(values.includes(current)) el.value = current;
+  }
+
+  function renderDetails(){
+    const month = document.getElementById('fMonth').value;
+    const region = document.getElementById('fRegion').value;
+    const shift = document.getElementById('fShift').value;
+    const agentQ = document.getElementById('fAgent').value.trim().toLowerCase();
+
+    let rows = ALL_ROWS.filter(r => {
+      if(month && r.month !== month) return false;
+      if(region && r.region !== region) return false;
+      if(shift && r.shift !== shift) return false;
+      if(agentQ && !(r.agentName.toLowerCase().includes(agentQ) || r.systemId.toLowerCase().includes(agentQ))) return false;
+      return true;
+    });
+
+    rows.sort((a,b) => a.sortKey.localeCompare(b.sortKey) || a.shift.localeCompare(b.shift));
+
+    const tbody = document.getElementById('tbody');
+    const table = document.getElementById('schedTable');
+    const stateMsg = document.getElementById('stateMsgDetails');
+
+    if(rows.length === 0){
+      table.style.display = 'none';
+      stateMsg.style.display = 'block';
+      stateMsg.textContent = 'কোনো তথ্য পাওয়া যায়নি — ফিল্টার বদলে দেখুন।';
+    } else {
+      table.style.display = 'table';
+      stateMsg.style.display = 'none';
+      tbody.innerHTML = rows.map(r => {
+        const isOff = /^off$/i.test(r.shift.trim());
+        return `<tr class="${isOff ? 'off-row' : ''}">
+          <td>${r.dateDisplay}</td>
+          <td>${isOff ? '<span class="off-tag">OFF</span>' : r.shift}</td>
+          <td>${r.systemId}</td>
+          <td>${r.agentName}</td>
+          <td><span class="pill ${regionPillClass(r.region)}">${r.region}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('summary').innerHTML =
+      `মোট <b>${rows.length}</b>টি এন্ট্রি দেখানো হচ্ছে${agentQ ? ` — "${document.getElementById('fAgent').value.trim()}"-এর জন্য` : ''}`;
+  }
+
+  /* ========== MAIN LOAD ========== */
+  async function loadAll(){
+    const stateMsgToday = document.getElementById('stateMsg');
+    const stateMsgDetails = document.getElementById('stateMsgDetails');
+    try{
+      ALL_ROWS = await fetchScheduleRows();
+
+      // today view
+      renderHeroDate();
+      const tKey = todaySortKey();
+      const todayRows = ALL_ROWS.filter(r => r.sortKey === tKey);
+      renderStats(todayRows);
+      renderGroups(todayRows);
+
+      // details view
+      populateSelect('fMonth', [...new Set(ALL_ROWS.map(r=>r.month))].filter(Boolean));
+      populateSelect('fRegion', [...new Set(ALL_ROWS.map(r=>r.region))].filter(Boolean));
+      populateSelect('fShift', [...new Set(ALL_ROWS.map(r=>r.shift))].filter(Boolean).sort());
+      renderDetails();
+
+      const updated = 'সবশেষ আপডেট: ' + new Date().toLocaleString('bn-BD', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
+      document.getElementById('updatedAt').textContent = updated;
+
+      stateMsgToday.classList.remove('error');
+      stateMsgDetails.classList.remove('error');
+    } catch(err){
+      const stateMsgToday = document.getElementById('stateMsg');
+      stateMsgToday.classList.add('error');
+      stateMsgToday.style.display = 'block';
+      document.getElementById('groupsHolder').innerHTML = '';
+      if(CONFIG.SHEET_ID === 'PASTE_YOUR_GOOGLE_SHEET_ID_HERE'){
+        stateMsgToday.textContent = 'এখনো Google Sheet কনফিগার করা হয়নি — shared.js ফাইলে CONFIG-এ SHEET_ID বসান।';
+      } else {
+        stateMsgToday.textContent = 'ডেটা লোড করা যায়নি। Sheet শেয়ারিং "Anyone with the link – Viewer" আছে কিনা, SHEET_ID/SHEET_NAME ঠিক আছে কিনা চেক করুন। (লোকাল ফাইলে সরাসরি খুললে ব্রাউজার এই রিকোয়েস্ট ব্লক করতে পারে — http server বা GitHub Pages দিয়ে টেস্ট করুন।)';
+      }
+      document.getElementById('updatedAt').textContent = '';
+      console.error(err);
+    }
+  }
+
+  /* ========== TOGGLE VIEW ========== */
+  function toggleView(e){
+    e.preventDefault();
+    showDetails = !showDetails;
+    todayView.style.display = showDetails ? 'none' : 'block';
+    detailsView.style.display = showDetails ? 'block' : 'none';
+    toggleBtn.textContent = showDetails ? '← আজকের শিডিউলে ফিরে যান' : 'সব এন্ট্রি দেখুন →';
+    if(showDetails) renderDetails();
+  }
+
+  /* ========== EVENT BINDING ========== */
+  toggleBtn.addEventListener('click', toggleView);
+
+  ['fMonth','fRegion','fShift'].forEach(id => document.getElementById(id).addEventListener('change', renderDetails));
+  document.getElementById('fAgent').addEventListener('input', renderDetails);
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    document.getElementById('fMonth').value = '';
+    document.getElementById('fRegion').value = '';
+    document.getElementById('fShift').value = '';
+    document.getElementById('fAgent').value = '';
+    renderDetails();
+  });
+
+  // initial load + refresh
+  loadAll();
+  setInterval(loadAll, CONFIG.REFRESH_MS);
+</script>
+</body>
+</html>
